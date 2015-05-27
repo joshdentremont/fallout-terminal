@@ -3,11 +3,16 @@
 import curses
 import random
 import os
+from fallout_functions import slowWrite
+
+################## text strings ######################
+
+HEADER_TEXT = 'ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL'
 
 ################## global "constants" ################
 
 # number of characters for hex digits and spaces
-CONST_WIDTH = 16
+CONST_CHARS = 16
 
 # position of the attempt squares
 SQUARE_X = 19
@@ -17,9 +22,6 @@ LOGIN_ATTEMPTS = 4
 
 # amount of time to pause after correct password input
 LOGIN_PAUSE = 3000
-
-# amount of time to pause after lockout
-LOCKED_OUT_TIME = 5000
 
 # starting number for hex generation
 START_HEX = 0xf650
@@ -100,18 +102,19 @@ def initScreen(scr):
     Fill the screen to prepare for password entry
     
     scr - curses window returned from curses.initscr()
-    """    
+    """
     size = scr.getmaxyx()
+    height = size[0]
     width = size[1]
-    height = size[0] - 5 # - 5 for header lines
+    fillerHeight = height - 5 # - 5 for header lines
 
-    hexes = generateHex(height * 2)
+    hexes = generateHex(fillerHeight * 2)
 
-    hexCol1 = hexes[:height]
-    hexCol2 = hexes[height:]
+    hexCol1 = hexes[:fillerHeight]
+    hexCol2 = hexes[fillerHeight:]
 
     # generate the symbols and passwords
-    fillerLength = width / 2 * height
+    fillerLength = width / 2 * fillerHeight
     passwords = getPasswords()
     filler = getFiller(fillerLength, passwords)
     fillerCol1 = filler[:len(filler) / 2]
@@ -121,8 +124,8 @@ def initScreen(scr):
     fillerWidth = width / 4
 
     # print the header stuff
-    scr.addstr('ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL\n')
-    scr.addstr('ENTER PASSWORD NOW\n\n')
+    scr.addstr(HEADER_TEXT)
+    scr.addstr('\nENTER PASSWORD NOW\n\n')
     scr.addstr(str(LOGIN_ATTEMPTS) + ' ATTEMPT(S) LEFT: ')
     for i in xrange(LOGIN_ATTEMPTS):
         scr.addch(curses.ACS_BLOCK)
@@ -130,9 +133,9 @@ def initScreen(scr):
     scr.addstr('\n\n')
 
     # print the hex and filler
-    for i in xrange(height):
+    for i in xrange(fillerHeight):
         scr.addstr("0x%X %s 0x%X %s" % (hexCol1[i], fillerCol1[i * fillerWidth: (i + 1) * fillerWidth], hexCol2[i], fillerCol2[i * fillerWidth: (i + 1) * fillerWidth]))
-        if i < height - 1:
+        if i < fillerHeight - 1:
             scr.addstr('\n')
 
     scr.refresh()
@@ -147,7 +150,7 @@ def moveInput(scr, inputPad):
     size = scr.getmaxyx()
     height = size[0]
     width = size[1]
-
+    
     inputPad.addstr('\n>')
 
     # cursor position relative to inputPad
@@ -155,7 +158,7 @@ def moveInput(scr, inputPad):
 
     inputPad.refresh(0, 0,
                      height - cursorPos[0] - 1,
-                     width / 2 + CONST_WIDTH,
+                     width / 2 + CONST_CHARS,
                      height - 1,
                      width - 1)
     
@@ -172,7 +175,7 @@ def userInput(scr, passwords):
     width = size[1]
     
     # set up a pad for user input
-    inputPad = curses.newpad(height, width / 2 + CONST_WIDTH)
+    inputPad = curses.newpad(height, width / 2 + CONST_CHARS)
 
     attempts = LOGIN_ATTEMPTS
 
@@ -182,7 +185,7 @@ def userInput(scr, passwords):
     
     while attempts > 0:
         # move the curser to the correct spot for typing
-        scr.move(height - 1, width / 2 + CONST_WIDTH + 1)
+        scr.move(height - 1, width / 2 + CONST_CHARS + 1)
 
         # scroll user input up as the user tries passwords
         moveInput(scr, inputPad)
@@ -204,7 +207,7 @@ def userInput(scr, passwords):
             moveInput(scr, inputPad)
 
             curses.napms(LOGIN_PAUSE)
-            return
+            return True
             
         # wrong password
         else:
@@ -234,28 +237,27 @@ def userInput(scr, passwords):
             scr.addstr(' ')
 
     # Out of attempts
-    scr.erase()
-    scr.move(height / 2 - 1, width / 2 - 7)
-    scr.addstr('TERMINAL LOCKED')
-    scr.move(height / 2 + 1, width / 2 - 16)
-    scr.addstr('PLEASE CONTACT AN ADMINISTRATOR')
-    curses.curs_set(0)
-    scr.refresh()
-
-    curses.napms(LOCKED_OUT_TIME)
+    return False
         
 def runLogin(scr):
     """
     Start the login portion of the terminal
     """
+    curses.use_default_colors()
+    size = scr.getmaxyx()
+    width = size[1]
+    height = size[0]
     random.seed()
+    # set screen to initial position
+    scr.erase()
+    scr.move(0, 0)
     passwords = initScreen(scr)
-    userInput(scr, passwords)
+    return userInput(scr, passwords)
 
 
 def beginLogin():
     """
     Initialize curses and start the login process
+    Returns true if the user correctly guesses the password
     """
-    scr = curses.initscr()
-    curses.wrapper(runLogin)
+    return curses.wrapper(runLogin)

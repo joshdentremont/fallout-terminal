@@ -17,5 +17,6 @@ To use the login in another program:
 ```
 import fallout_login
 
+# returns true if the correct password is entered, false otherwise
 fallout_login.beginLogin()
 ```
