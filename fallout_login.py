@@ -20,6 +20,8 @@ SQUARE_Y = 3
 
 LOGIN_ATTEMPTS = 4
 
+HEADER_LINES = 5
+
 # amount of time to pause after correct password input
 LOGIN_PAUSE = 3000
 
@@ -106,7 +108,7 @@ def initScreen(scr):
     size = scr.getmaxyx()
     height = size[0]
     width = size[1]
-    fillerHeight = height - 5 # - 5 for header lines
+    fillerHeight = height - HEADER_LINES
 
     hexes = generateHex(fillerHeight * 2)
 
@@ -124,19 +126,23 @@ def initScreen(scr):
     fillerWidth = width / 4
 
     # print the header stuff
-    scr.addstr(HEADER_TEXT)
-    scr.addstr('\nENTER PASSWORD NOW\n\n')
-    scr.addstr(str(LOGIN_ATTEMPTS) + ' ATTEMPT(S) LEFT: ')
+    slowWrite(scr, HEADER_TEXT)
+    slowWrite(scr, '\nENTER PASSWORD NOW\n\n')
+    slowWrite(scr, str(LOGIN_ATTEMPTS) + ' ATTEMPT(S) LEFT: ')
     for i in xrange(LOGIN_ATTEMPTS):
         scr.addch(curses.ACS_BLOCK)
-        scr.addstr(' ')
-    scr.addstr('\n\n')
+        slowWrite(scr, ' ')
+    slowWrite(scr, '\n\n')
 
     # print the hex and filler
     for i in xrange(fillerHeight):
-        scr.addstr("0x%X %s 0x%X %s" % (hexCol1[i], fillerCol1[i * fillerWidth: (i + 1) * fillerWidth], hexCol2[i], fillerCol2[i * fillerWidth: (i + 1) * fillerWidth]))
+        slowWrite(scr, "0x%X %s" % (hexCol1[i], fillerCol1[i * fillerWidth: (i + 1) * fillerWidth]), 1)
         if i < fillerHeight - 1:
             scr.addstr('\n')
+
+    for i in xrange(fillerHeight):
+        scr.move(HEADER_LINES + i, CONST_CHARS / 2 + fillerWidth)
+        slowWrite(scr, '0x%X %s' % (hexCol2[i], fillerCol2[i * fillerWidth: (i + 1) * fillerWidth]), 1)
 
     scr.refresh()
 

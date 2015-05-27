@@ -1,6 +1,6 @@
 import curses
 
-LETTER_PAUSE = 20
+LETTER_PAUSE = 5
 
 def slowWrite(window, text, pause = LETTER_PAUSE):
     """
