@@ -60,18 +60,16 @@ def getPasswords():
     """
     Returns an array of strings to be used as the password and the decoys
     """
-    # temporarily hard coded for testing
-    #TODO - move the passwords out of this file and add more arrays
-    passwords = [
-        'FEVER',
-        'SEVER',
-        'SEWER',
-        'SEVEN',
-        'ROVER',
-        'ERROR',
-        'HELLO',
-        'BOXER'
-    ]
+    groups = []
+    # read from passwords.txt
+    with open("passwords.txt") as pwfile:
+        for line in pwfile:
+            if not line.strip():
+                groups.append([])
+            elif len(groups) > 0:
+                groups[len(groups) - 1].append(line[:-1])
+
+    passwords = groups[random.randint(0, len(groups) - 1)]
 
     random.shuffle(passwords)
     return passwords
