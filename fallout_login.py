@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 import curses
 import random
 import os
@@ -61,8 +59,13 @@ def getPasswords():
     Returns an array of strings to be used as the password and the decoys
     """
     groups = []
+
+    # script file / password file location
+    __location__ = os.path.realpath(os.path.join(os.getcwd(),
+                                                 os.path.dirname(__file__)))
+    
     # read from passwords.txt
-    with open("passwords.txt") as pwfile:
+    with open(os.path.join(__location__, "passwords.txt")) as pwfile:
         for line in pwfile:
             if not line.strip():
                 groups.append([])

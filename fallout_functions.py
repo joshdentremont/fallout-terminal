@@ -1,4 +1,6 @@
 import curses
+import time
+import sys
 
 LETTER_PAUSE = 5
 
