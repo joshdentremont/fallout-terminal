@@ -1,6 +1,7 @@
 import curses
 
 from fallout_functions import slowWrite
+from fallout_functions import centeredWrite
 
 ################## text strings ######################
 
@@ -25,10 +26,10 @@ def runLocked(scr):
     # set screen to initial position
     scr.erase()
     curses.curs_set(0)
-    scr.move(height / 2 - 1, width / 2 - len(LOCKED_1) / 2)
-    slowWrite(scr, LOCKED_1)
-    scr.move(height / 2 + 1, width / 2 - len(LOCKED_2) / 2)
-    slowWrite(scr, LOCKED_2)
+    scr.move(height / 2 - 1, 0)
+    centeredWrite(scr, LOCKED_1)
+    scr.move(height / 2 + 1, 0)
+    centeredWrite(scr, LOCKED_2)
     scr.refresh()
     curses.napms(LOCKED_OUT_TIME)
 

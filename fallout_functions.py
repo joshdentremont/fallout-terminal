@@ -6,7 +6,7 @@ LETTER_PAUSE = 5
 
 INPUT_PAUSE = 500 # ms
 
-TYPE_DELAY = 30
+TYPE_DELAY = 40
 
 HIDDEN_MASK = '*'
 
@@ -59,3 +59,11 @@ def upperInput(window, hidden = False, can_newline = True):
         elif can_newline:
             window.addch(NEWLINE)
     return instr
+
+def centeredWrite(window, text, pause = LETTER_PAUSE):
+    """
+    Writes to the current line but centers the text
+    """
+    width = window.getmaxyx()[1]
+    window.move(window.getyx()[0], width / 2 - len(text) / 2)
+    slowWrite(window, text, pause)
