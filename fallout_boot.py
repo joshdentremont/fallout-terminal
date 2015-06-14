@@ -1,4 +1,7 @@
 from fallout_functions import slowWrite
+from fallout_functions import INPUT_PAUSE
+from fallout_functions import TYPE_DELAY
+from fallout_functions import upperInput
 import curses
 
 ######################## global 'constants' ##############
@@ -11,9 +14,6 @@ ENTRY_3 = 'SET HALT RESTART/MAINT'
 
 ENTRY_4 = 'RUN DEBUG/ACCOUNTS.F'
 
-INPUT_PAUSE = 500 # ms
-
-TYPE_DELAY = 25
 
 ######################## text strings ####################
 
@@ -35,12 +35,16 @@ MESSAGE_3 = 'Initializing Robco Industries(TM) MF Boot Agent v2.3.0\n' \
 def runBoot(scr, hardMode):
     """
     Start the boot portion of the terminal
+
+    hardMode - boolean indicating whether the user has to enter the ENTRY
+               constants, or if they are entered automatically
     """
     curses.use_default_colors()
     scr.erase()
     scr.move(0, 0)
 
-    curses.echo()
+    curses.noecho()
+    scr.scrollok(True)
     
     slowWrite(scr, MESSAGE_1 + '\n\n')
 
@@ -49,7 +53,7 @@ def runBoot(scr, hardMode):
         entry = ''
         while entry.upper() != ENTRY_1.upper():
             slowWrite(scr, '>')
-            entry = scr.getstr()
+            entry = upperInput(scr)
     else:
         # input is entered for them
         slowWrite(scr, '>')
@@ -62,10 +66,10 @@ def runBoot(scr, hardMode):
         entry = ''
         while entry.upper() != ENTRY_2.upper():
             slowWrite(scr, '>')
-            entry = scr.getstr()
+            entry = upperInput(scr)
         while entry.upper() != ENTRY_3.upper():
             slowWrite(scr, '>')
-            entry = scr.getstr()
+            entry = upperInput(scr)
     else:
         slowWrite(scr, '>')
         curses.napms(INPUT_PAUSE)
@@ -80,7 +84,7 @@ def runBoot(scr, hardMode):
         entry = ''
         while entry.upper() != ENTRY_4.upper():
             slowWrite(scr, '>')
-            entry = scr.getstr()
+            entry = upperInput(scr)
     else:
         slowWrite(scr, '>')
         curses.napms(INPUT_PAUSE)
