@@ -14,8 +14,7 @@ if boot.beginBoot(hard):
     pwd = hack.beginLogin()
     if pwd != None:
         login.beginLogin(hard, 'ADMIN', pwd)
-        print select.beginSelection()
+        print(select.beginSelection())
     else:
         locked.beginLocked()
-        print 'Login failed'
-
+        print('Login failed')
