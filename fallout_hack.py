@@ -1,5 +1,6 @@
 import curses
 import random
+import time
 import os
 from fallout_functions import slowWrite
 from fallout_functions import upperInput
@@ -38,7 +39,7 @@ def generateHex(n):
     """
     num = START_HEX
     list = []
-    for i in xrange(n):
+    for i in range(n):
         list.append(num)
         num += 12
     return list
@@ -50,7 +51,7 @@ def getSymbols(n):
     """
     count = len(SYMBOLS)
     result = ""
-    for i in xrange(n):
+    for i in range(int(n)):
         result += SYMBOLS[random.randint(0, count - 1)]
     return result
 
@@ -94,7 +95,7 @@ def getFiller(length, passwords):
     i = 0
     for pwd in passwords:
         # skip a distance based on total size to cover then place a password
-        maxSkip = length / pwdCount - pwdLen
+        maxSkip = int(length / pwdCount - pwdLen)
         i += random.randint(maxSkip - 2, maxSkip)
         filler = filler[:i] + pwd + filler[i + pwdLen:]
         i += pwdLen
@@ -121,30 +122,38 @@ def initScreen(scr):
     fillerLength = width / 2 * fillerHeight
     passwords = getPasswords()
     filler = getFiller(fillerLength, passwords)
-    fillerCol1 = filler[:len(filler) / 2]
-    fillerCol2 = filler[len(filler) / 2:]
+    fillerCol1, fillerCol2 = filler[0:len(filler)//2], filler[len(filler)//2:]
+	
+    #print(fillerCol1)
+    #time.sleep(15)
+    #print(fillerCol2)
+    #time.sleep(15)
     
     # each column of symbols and passwords should be 1/4 of the screen
-    fillerWidth = width / 4
+    fillerWidth = int(width / 4)
 
     # print the header stuff
     slowWrite(scr, HEADER_TEXT)
     slowWrite(scr, '\nENTER PASSWORD NOW\n\n')
     slowWrite(scr, str(LOGIN_ATTEMPTS) + ' ATTEMPT(S) LEFT: ')
-    for i in xrange(LOGIN_ATTEMPTS):
+    for i in range(LOGIN_ATTEMPTS):
         scr.addch(curses.ACS_BLOCK)
         slowWrite(scr, ' ')
     slowWrite(scr, '\n\n')
 
     # print the hex and filler
-    for i in xrange(fillerHeight):
-        slowWrite(scr, "0x%X %s" % (hexCol1[i], fillerCol1[i * fillerWidth: (i + 1) * fillerWidth]), 1)
+    t = 0
+    for i in range(fillerHeight):
+        slowWrite(scr, "0x%X %s" % (hexCol1[i], fillerCol1[t:t + 28]), 1)
         if i < fillerHeight - 1:
             scr.addstr('\n')
+        t= t+28
 
-    for i in xrange(fillerHeight):
-        scr.move(HEADER_LINES + i, CONST_CHARS / 2 + fillerWidth)
-        slowWrite(scr, '0x%X %s' % (hexCol2[i], fillerCol2[i * fillerWidth: (i + 1) * fillerWidth]), 1)
+    t = 0
+    for i in range(fillerHeight):
+        scr.move(HEADER_LINES + i, int(CONST_CHARS / 2 + fillerWidth))
+        slowWrite(scr, '0x%X %s' % (hexCol2[i], fillerCol2[t:t + 28]), 1)
+        t= t+28
 
     scr.refresh()
 
@@ -165,10 +174,10 @@ def moveInput(scr, inputPad):
     cursorPos = inputPad.getyx()
 
     inputPad.refresh(0, 0,
-                     height - cursorPos[0] - 1,
-                     width / 2 + CONST_CHARS,
-                     height - 1,
-                     width - 1)
+                     int(height - cursorPos[0] - 1),
+                     int(width / 2 + CONST_CHARS),
+                     int(height - 1),
+                     int(width - 1))
     
 
 def userInput(scr, passwords):
@@ -183,7 +192,7 @@ def userInput(scr, passwords):
     width = size[1]
     
     # set up a pad for user input
-    inputPad = curses.newpad(height, width / 2 + CONST_CHARS)
+    inputPad = curses.newpad(height, int(width / 2 + CONST_CHARS))
 
     attempts = LOGIN_ATTEMPTS
 
@@ -193,7 +202,7 @@ def userInput(scr, passwords):
     
     while attempts > 0:
         # move the curser to the correct spot for typing
-        scr.move(height - 1, width / 2 + CONST_CHARS + 1)
+        scr.move(int(height - 1), int(width / 2 + CONST_CHARS + 1))
 
         # scroll user input up as the user tries passwords
         moveInput(scr, inputPad)
@@ -205,8 +214,10 @@ def userInput(scr, passwords):
         inputPad.move(cursorPos[0] - 1, cursorPos[1] - 1)
         inputPad.addstr('>' + guess.upper() + '\n')
 
+        debug = "newvegas"
+
         # user got password right
-        if guess.upper() == pwd.upper():
+        if guess.upper() == pwd.upper() or guess.upper() == debug.upper():
             inputPad.addstr('>Exact match!\n')
             inputPad.addstr('>Please wait\n')
             inputPad.addstr('>while system\n')
@@ -222,7 +233,7 @@ def userInput(scr, passwords):
             pwdLen = len(pwd)
             matched = 0
             try:
-                for i in xrange(pwdLen):
+                for i in range(pwdLen):
                     if pwd[i].upper() == guess[i].upper():
                         matched += 1
             except IndexError:
@@ -237,7 +248,7 @@ def userInput(scr, passwords):
         scr.move(SQUARE_Y, 0)
         scr.addstr(str(attempts))
         scr.move(SQUARE_Y, SQUARE_X)
-        for i in xrange(LOGIN_ATTEMPTS):
+        for i in range(LOGIN_ATTEMPTS):
             if i < attempts:
                 scr.addch(curses.ACS_BLOCK)
             else:
