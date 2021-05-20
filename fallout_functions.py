@@ -18,7 +18,7 @@ def slowWrite(window, text, pause = LETTER_PAUSE):
     """
     wrapper for curses.addstr() which writes the text slowely 
     """
-    for i in xrange(len(text)):
+    for i in range(len(text)):
         window.addstr(text[i])
         window.refresh()
         curses.napms(pause)
@@ -65,5 +65,5 @@ def centeredWrite(window, text, pause = LETTER_PAUSE):
     Writes to the current line but centers the text
     """
     width = window.getmaxyx()[1]
-    window.move(window.getyx()[0], width / 2 - len(text) / 2)
+    window.move(window.getyx()[0], int(width / 2 - len(text) / 2))
     slowWrite(window, text, pause)

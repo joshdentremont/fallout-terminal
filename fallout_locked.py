@@ -26,9 +26,9 @@ def runLocked(scr):
     # set screen to initial position
     scr.erase()
     curses.curs_set(0)
-    scr.move(height / 2 - 1, 0)
+    scr.move(int(height / 2 - 1), 0)
     centeredWrite(scr, LOCKED_1)
-    scr.move(height / 2 + 1, 0)
+    scr.move(int(height / 2 + 1), 0)
     centeredWrite(scr, LOCKED_2)
     scr.refresh()
     curses.napms(LOCKED_OUT_TIME)

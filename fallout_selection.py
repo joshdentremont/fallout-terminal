@@ -83,7 +83,7 @@ def runSelection(scr):
     for header in OTHER_HEADERS:
         slowWrite(scr, header + '\n')
 
-    for i in xrange(width):
+    for i in range(width):
         scr.addch(curses.ACS_BSBS)
     scr.refresh()
 
