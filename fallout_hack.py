@@ -142,18 +142,14 @@ def initScreen(scr):
     slowWrite(scr, '\n\n')
 
     # print the hex and filler
-    t = 0
     for i in range(fillerHeight):
-        slowWrite(scr, "0x%X %s" % (hexCol1[i], fillerCol1[t:t + 28]), 1)
+        slowWrite(scr, "0x%X %s" % (hexCol1[i], fillerCol1[i * fillerWidth: (i + 1) * fillerWidth]), 1)
         if i < fillerHeight - 1:
             scr.addstr('\n')
-        t= t+28
 
-    t = 0
     for i in range(fillerHeight):
         scr.move(HEADER_LINES + i, int(CONST_CHARS / 2 + fillerWidth))
-        slowWrite(scr, '0x%X %s' % (hexCol2[i], fillerCol2[t:t + 28]), 1)
-        t= t+28
+        slowWrite(scr, '0x%X %s' % (hexCol2[i], fillerCol2[i * fillerWidth: (i + 1) * fillerWidth]), 1)
 
     scr.refresh()
 
@@ -214,10 +210,8 @@ def userInput(scr, passwords):
         inputPad.move(cursorPos[0] - 1, cursorPos[1] - 1)
         inputPad.addstr('>' + guess.upper() + '\n')
 
-        debug = "newvegas"
-
         # user got password right
-        if guess.upper() == pwd.upper() or guess.upper() == debug.upper():
+        if guess.upper() == pwd.upper():
             inputPad.addstr('>Exact match!\n')
             inputPad.addstr('>Please wait\n')
             inputPad.addstr('>while system\n')
